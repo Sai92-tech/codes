@@ -126,5 +126,34 @@ pipeline {
     }
 }
 
+######  Build jobs retry OR re trigger
+pipeline {
+    agent any
+
+    stages {
+        stage ('') {
+            steps {
+                retry(3) 
+                excution path
+            }
+        }
+    }
+}
+
+
+############## Build Discardes
+pipeline {
+    agent any
+    options {
+        build discard details get it from pipeline syntax
+    }
+    stages {
+        stage {
+            steps {
+                ecxution path
+            }
+        }
+    }
+}
 
 
