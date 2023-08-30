@@ -1,0 +1,660 @@
+### For Normal pod Creation
+kind: Pod
+apiVersion: v1
+metadata: 
+  name: nginxpod
+  labels: 
+    app: web
+spec:
+  containers: 
+  - name: cont1
+    image: nginx
+    ports:
+    - container port: 80
+
+################
+Config map inside a pod
+
+apiVersion: v1
+kind: Pod
+metadata:
+  name: mypo1-configmap
+spec: 
+  containers: 
+  -  name: cont1
+     image: nginx
+     volumeMounts:
+       - name: configmap
+         mountPath: "/etc/root"
+         readOnly: true
+  volumes:
+    - name: test1-vol
+      configMap: 
+      -  name: configMap
+         items: 
+         - key: file1.txt
+           path: file1a.txt
+         - key: file2.txt
+           path: file2.txt
+
+############################ Replication controllers
+
+apiVersion: v1                         ######### For replicaset we must to use app/v1 in apiVersion
+kind: ReplicationController            #######  For replicaset we must to use replicaset
+metadata:
+  name: myrc
+spec:
+  replicas: 3
+  selector:
+    matchLables:
+       app: web
+  template:
+    metadata:
+      name:
+      labels:
+        app: web
+    spec:
+      containers:
+        name:
+        image:
+        ports:
+        - containerPort: 80
+
+
+#############  For deployment 
+apiVerision: apps/v1
+kind: Deployment
+metadata:
+  name:  name of pod u can give any name
+  nameSpace: name space is must y becz this name space will deside to pod save on which name... u wont give any name its saved by defalut name space
+spec:
+  replicas: 5
+  selector:
+    matchlables: 
+      app: web
+  template:
+    metadata: 
+      name: pod name
+      lables: lables for pod 
+        app: web
+    spec:
+      containers:
+      - name: container name
+        image: os image
+        ports:
+        - containerPort: image port   
+
+############# For Deamonsets...it is helps creats a one pod in only one workernode
+
+apiVersion: apps/v1
+kind: Deamonset
+metadata:
+  name:
+  nameSpace:
+spec:
+  selector:
+    matchlables:
+      app: web
+  template:
+    metadata:
+      name: pod name
+      lables:
+        app: web
+    spec:
+      containers:
+      - name:
+        image: 
+        ports:
+        - containerPort: 
+      nodeSelector:
+        disktype: ssd                ######### In Daemonset assain the labels for worker node & nodeselector sholud be contanier specification  
+
+
+###########  For Job config at container
+
+apiVersion: batch/v1
+kind: Job
+metadata: 
+  name: countdown
+spec:
+  template:
+    metadata:
+      name: countdown
+    spec:
+      containers:
+      - name:
+        image:
+        ports:
+        - containerPort:
+        command:
+         - "/bin/bash"
+         - "-c"
+         - "for i in 9 8 7 6 5 4 3 2 1 ; do echo $i :done"
+        restartPolicy: Never 
+
+########## For Cron Scedule job
+apiVersion: batch/v1
+kind: Cronjob
+metadata: 
+  name: hello
+spec:
+  schedule: "* * * * *"
+  template:
+    metadata:
+      name: hello
+    spec:
+      containers:
+      - name:
+        image:
+        ports:
+        - containerPort:
+        command:
+         - "/bin/bash"
+         - "-c"
+         - "for i in 9 8 7 6 5 4 3 2 1 ; do echo $i :done"
+        restartPolicy: Never 
+
+
+########## For Service manifest
+apiVersion: v1
+kind: Service
+metadata:
+  name: Service name
+  lable:
+    app: lable of app
+spec:
+  selector:
+    matchLable:
+      app: above lable name nd these lable name sholud be match
+  type: NodePort
+  ports:
+  - nodePort: 31000  nodeport should be 31000-32767 below only
+    port: webserver port if webserver is nginx then port is 80
+    targetPort: target port sholud be match with deployment app port container port here container is nginx-80   
+
+    
+###### For entaire one application  nodeport to frontend nd backend clusterip and clustr and backend nd database 
+### we need a 6 manifesto files 
+#### 1st is application deployment in database (database image is radis)
+vi radis-master-deploment.yaml  (for backend deployment)
+apiVersion: apps/v1  ######## inthe latest radies app apiversion is (extensions/v1beta1)
+kind: Deployment
+metadata:
+  name: radis-master    #### is the name of depolyment
+spec:
+  replicas: 1
+  selectors:
+    matchlables:
+      app: radis
+      role: master
+      tier: backend
+  template:
+    metadata:
+      name: radis_master
+      lables: 
+        app: radis
+        role: master
+        tier: backend
+    spec:
+      containers:
+      - name: radisContainer
+        image: k8s.gcr.io/radis:e2e
+        ports:
+        - containerPort: 6379 
+## continue the above now we create to slave database yaml file in only few changes
+vi radis-slave-deployment.yaml  (for backend deployment)
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: radis-slave.
+spec:
+  replicas: 3
+  template:
+    metadata:
+      lables:
+        app: radis
+        role: slave
+        tier: backend
+    spec:
+      containers:
+      -name: slave
+       image: gcr.io/google_samples/gb-redisslave:v1
+        ports:
+        - containerPort: 6379
+
+##### Create a Cluster ip service manifest file for 2 dackend database deployment
+### for Master and slave
+vi radis-master-service.yaml
+apiVersion: v1
+kind: service
+metadata:
+  name: radis-master
+  lables:
+    app: radis
+    role: master
+    tier: backend
+spec:
+  type: ClusterIp
+  selector:
+    lables:
+      app: radis
+      role: master
+      tier: backend
+  ports:
+  - port: 6379
+    targetPort: 6379
+## for slave port
+vi radis-slave-service.yaml
+apiVersion: v1
+kind: service
+metadata:
+  name: radis-slave
+  lables:
+    app: radis
+    role: slave
+    tier: backend
+spec:
+  selector:
+    lables:
+      app: radis
+      role: slave
+      tier: backend
+  type: clusterIp
+  ports:
+  - nodePort: not required
+    port: 6379
+    targetPort: 6379
+
+###vi frontend-deployment.yaml
+apiVersion: extensison/v1beta1 r apps/v1
+kind: Deployment
+metadata: 
+  name: frontend
+spec: 
+  replicas: 3
+  selector:
+    matchLables:
+      lables:
+        app: guestBook
+        tier: frontend 
+  template:
+    metadata:
+      name: frontend
+      lables:
+        app: guetsbook
+        tier: frontend
+    spec: 
+      containers:
+      - name: php-radis
+        image: gcr.io/google-sample/gb-frontend:v4 
+        ports:
+        - containerPort: 80
+### Service For Frontend Deployment
+apiversion: v1    
+kind: Service
+metadata:
+  name: frontend
+  lables: 
+    app: guestbook
+    tier: Frontend
+spec:
+  selector:
+    lables:
+      app: guestbook
+      tier: frontend
+  type: LoadBalancer
+  ports:
+  - port: 80
+######## For Create a new sapce By declarative method
+apiVersion: v1
+kind: nameSpace
+metadata:
+  name: dev
+######### For EmptyDir Volume
+apiVersion: v1
+kind: Pod
+metadata:
+  name:
+  nameSpace:
+spec:
+  containers:
+  - name: name of container
+    image: k8s.gcr.io/test-websever
+    volumemount: 
+    - name: name of the volume cache-volumes
+      mountPath: /cashe
+  volumes:
+  - name: 
+    emptyDir: {}
+############## For Role Creation
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  name: deployment-role
+  nameSpace: frontend
+spec:
+  rules:
+    - apiGroups:
+        - ""
+        - extensions
+        - apps
+      resources:
+        - deployments
+        - replicas
+        - pods
+        - service
+        - deamonset
+        - secret
+      verbs:
+        - create
+        - get
+        - list
+        - update
+        - delete
+        - watch
+        - patch
+##### For Role-binding
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: depolyment-roledinding
+  nameSpace: frontend
+roleRef:
+  apiGroup: ""
+  kind: Role
+  name: depolyment-role
+subjects:
+  - kind: user
+    name: devops ###whatever u created user at AWS that name is mention hear
+    apiGroup: ""
+
+##### For HPA CPU UTILIZATION
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: name of the pod
+  lables:
+    app: u can give any to identify the pod name
+spec:
+  replicas: 3
+  selectors:
+    matchLables:
+      app: u can give any name but match with above pod lable name
+  template:
+    metadata:
+      name: name of the pod
+      lables:
+        app: above lable name
+    spec:
+      containers:
+      - name:
+        image:
+        ports:
+        - containerPort:
+        resources:
+          limits:
+            cpu: 20m  ### how much amount of cpu is my singal pod can go upto maximum
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name:
+spec:
+  type: clusterIp
+  selector: 
+    app: nginx
+  ports:
+   - protocal: tcp
+     port: 80 ## image defalut port
+     targetPOrt: 80 ###Custom port
+
+--- ### for HPA Horizontal auto scalling For Cpu Utilization
+apiVersion: autoscalling/v2
+kind: HorizontalPodAutoscaler
+metadata: 
+  name: nginx-hpa
+spec: 
+  scaleTargetRef:
+    apiVersion: apps/v1
+    kind: Deployment
+    name: nginx
+  minReplicas: 3
+  maxReplicas: 10
+  metrics:
+    - type: Resource
+      resource:
+        name: cpu
+        target:
+          type: Utilization
+          avarageUtilization: 10
+
+#### HPA For Memory
+apiVersion: autoscalling/v1
+kind: HorizontalAutoScalar
+metadata:
+  name: nginx-memory-hpa
+spec:
+  minReplicas: 3
+  maxReplicas: 10
+  scaleTargetRef:
+    apiVersion: apps/v1
+    kind: Deployment
+    name: nginx
+  metrics:
+  - type: Resource
+    resource:
+      name: memory
+      target: 
+        avarageUtilization: 40  
+
+#### For Realtime Example two applications Mango DB and Mango Express
+apiVersion: apps/v1
+kind: Depolyment
+metadata:
+  name: mangodb-deployment
+  lables:
+    app: mangodb
+spec:
+  replicas: 2
+  minsecReady: 10
+  selector:
+    matchLables:
+      app: mongodb
+    template:
+      metadata:
+        name: mongodb
+        lables:
+          app: mongodb
+      spec:
+        containers:
+        - name: mongodb-cont1
+          image: mongo
+          ports:
+          - containerPort: 27017
+          env: 
+          - name: MONGO_INITDB_ROOT_USERNAME
+            valueFrom:
+              secretKeyRef:
+                name: mongodb-secret                ### whatever u mentioned the secet.yaml file metadata name that should be given here
+                key: mongo-root-username
+          - name: MONGO_INITDB_ROOT_PASSWORD
+          valueFrom:
+              secretKeyRef:
+                name: mongodb-secret
+                key: mongo-root-password
+              
+
+ ### ---- we have to create secreat file for no body can access my files
+apiVersion: v1
+kind: Secret
+metadata: 
+   name: mongodb-secret
+type: Opaque
+data: 
+  name: saikumar karothi    OR ### Go to the Cluster ip lets excute the command is (echo -n 'username' | base64)
+  password: Karothisai92@   OR ### Go to the cluster ip lets excute the command is (echo -n 'password' | base64)
+                                     ### oncve excute the  commands one value is came  cpy n past it 
+
+### to Create a internal service for mongodb
+apiVersion: v1
+kind: Service
+metadata:
+  name: mongod-service
+  lables:
+    app: mongodb
+spec:
+  selector:
+    matchLables:
+      app: mongodb
+    type: clusterIP
+    ports:
+    - nodeport: TCP
+      port: 27017
+      targetPort: 27017
+
+### For Create mongo Express Deployment File
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: mongodb-express
+  lables:
+    app: mongodb-express
+spec:
+  replicas: 2
+  selector:
+    matchLables:
+      app: mongodb-express
+    template:
+      metadata:
+        name: mongodb-express
+        lables:
+          app: mongodb-express
+      spec:
+        containers:
+        - name: name of container
+          image:
+          ports:
+          - containerPort: 8081
+          env:
+          - name: ME_CONFIG_MONGODB_ADMINUSERNAME
+            valuefrom:
+              secretKeyRef:
+                name: mongodb-secret
+                key:  mongo-root-username
+          - name: ME_CONFIG_MONGODB_ADMINPASSWORD
+            valueFrom:
+              secretKeyRef:
+                name: mongodb-secret
+                key:  mongo-root-password
+          - name: MG_CONFIG_MONGODB-SERVER
+            valueFrom:
+              configMapKeyRef:
+                name: mongodb-configmap
+                key: database_url
+--- service file for mongoexpress deployment
+apiVersion: v1
+kind: Service
+metadata:
+  name: mongo-express-service
+  lables:
+    app: mongo-express
+spec:
+  type: LoadBalancer ### for External Service
+  selector:
+    matchLables:
+      app: mongo-express
+    ports:
+    - protocal: TCP
+      port: 8081
+      tagerPort: 8081 
+      nodePort: 31500   ### Nodeport range is always 30000- 32767
+#### For Configmap
+apiVersion: v1
+kind: ConfigMap
+matadata:
+  name: mongodb-configmap
+data:
+  database_url: mongodb-service    ### url always name of the services
+
+######## HPA HORIZONTAL POD AUTOSCALLING
+apiVersion: apps/v1
+kind: Depolyment
+metadata:
+  name: nginx
+  lables: 
+    app: nginxapp
+spec:
+  replicas: 3
+  selector:
+    matchlabels:
+      app: nginxapp
+  template:
+    metadata:
+      name: nginxpod
+      lables: 
+        app: nginxapp
+    spec:
+      containers:
+      - name: nginx
+        image: nginx:latest
+        resources:
+          limits:
+            cpu: 20m
+HPA SERVICE
+apiVersion: v1
+kind: service
+metadata:
+  name: service name
+  lables:
+    app: nginxpod
+spec:
+  type: ClusterIP
+  selector:
+    app: nginx
+  ports: 
+    protocal: tcp
+    port: 80
+    targetPort: 80 
+HPA AutoScalling    For CPU
+apiVersion: AutoScalling/v2
+kind: HorizontalPodAutoScale
+metadata:
+  name: nginx-hpa
+spec:
+  scaleTargetRef:
+    apiVersion: apps/v1
+    kind: Deployment
+    name: nginx
+  minreplicas: 3
+  maxreplicas: 10
+  metrics:
+    - type: Resource
+      resource:
+        name: cpu
+        target:
+          type: utilization
+          avarageUtilization: 10
+HPA AUTOSCALLING FOR MEMORY
+apiVersion: autoscalling/v1
+kind: HorizontalAutoScaler
+metadata:
+  name: nginx-hpa-memory
+spec:
+  scaleTargerRef:
+    apiVersion: apps/v1
+    kind: Deployment
+    name: nginx deployment name
+  minReplicas: 1
+  maxReplicas: 5
+  metrics:
+    - type: Resource
+      resource:
+        name: memory
+        targetAvarageUtilization: 40
+
+
+        s
+        s
+        s
+        s
+        

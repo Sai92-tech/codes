@@ -1,0 +1,269 @@
+/// cicd pipeline
+pipeline {
+    agent any 
+    stages {
+        stage(shell) {
+            steps {
+                retry(4) {    //// its retry count
+                echo "hello world"
+                error "hheehhhe"
+                } 
+                echo "after retry(4)"
+            }
+        }
+    }
+} 
+/// pipeline build parallel
+pipeline {
+    agent any
+    stages {
+        stage('stages running in parallel') {
+            failfast true
+            parallel {
+                stage('clone') {
+                    steps {
+                        echo "heells"
+                        sleep 10 /// this point used to know the build after build
+                    }
+                }
+                stage('2nd stage') {
+                    steps {
+                        echo "to print a massage"
+                        sleep 20
+                    }
+                }
+                stage('3rd stage') {
+                    steps {
+                        ehco "to print a massage"
+                        sleep 30
+                    }
+                }
+            }
+        }
+    }
+}
+
+
+////To clone the source code from git hub 
+pipeline {
+    agent any
+    stages {
+        stage ('clone') {
+            steps {
+                checkout scmGit(branches: [[name: '*/main']], extensions: [], userRemoteConfigs: [[credentialsId: 'sai_git', url: 'https://github.com/Sai92-tech/maven-sample-project.git']])
+            }
+        }
+        stage ('build') {
+            steps {
+                sh 'mvn clean package'
+            }
+            post{
+                success{
+                    echo "archivin the artifact"
+                    archiveArtifacts artifacts: '**/target/*.war'
+                }
+            }
+        }
+        stage ('upload to artifact') {
+            steps {
+                nexusArtifactyUploadr artifactr[syntex get in pipeline  script in jenkins io documentaion]  nexus loging details have to provide   
+            }
+        } 
+    }    
+}    
+
+//// For BuildDiscard its uses log rotaions
+pipeline {
+    agentany
+    options{
+        buildDiscards (synatax get iin jenkins scripted pipeline)
+    }
+    stages {
+        stage ("shell") {
+            steps {
+                echo "hello"
+            }
+        }
+    }
+}
+
+//// For job config by using build peridically
+pipeline {
+    agentany
+    triggers {
+        cron ("*/1 * * * *")
+    }
+    stages {
+        stage ("shell") {
+            steps {
+
+            }
+        }
+    }
+}
+
+//// For job config by using pollscm
+pipeline {
+    agentany
+    triggers {
+        pollSCM ("*/1 * * * *")
+    }
+    stages {
+        stage ("clone") {
+            steps {
+                checkoutscm
+            }
+        }
+    }
+}
+
+//// upstream jobs
+pipeline {
+    agentany
+    triggers {
+        upstream(upstreamprojects: 'pipeline', threshold: hudson.model.reslut.success)
+    }
+    stages {
+        stage ("build") {
+            steps {
+                echo "it will trigger a pipeline"
+            }
+        }
+    }
+}
+
+//// declare a variables
+pipeline {
+    agentany
+    environment {
+        version="1.0"
+        name="sai"
+    }
+    stages {
+        stage () {
+            when {
+                allof {
+                    environment name: "version" value: "1.0"
+                    environment name: "name" value: "sai"
+                }
+            }
+            steps{
+                echo building all of {$name}
+            }
+        }
+    }
+}
+
+
+//// for deploy to taomcat server
+pipeline{
+    agentany
+    stages{
+        stage ("deploy on tomcat") {
+            steps {
+                deploy adapters (syntx get in pipelinescrpuitye)
+            }
+        }
+    }
+}
+
+
+//// only one stage build pipeline
+
+pipeline{
+    agentany
+    stages{
+        stage (clone) {
+            steps{
+                checkout (cloneuing from git clone checkoutscm)
+            }
+        }
+        stage (build) {
+            steps {
+                sh 'mvn clean package'
+            }
+        }
+        stage (upload nexus) {
+            when {
+                branch "release"
+            }
+            steps{
+                nexusatrifactupload syntax get from pipeline scripted
+            }
+        }
+    }
+}
+
+//// string parameter
+pipeline {
+    agentany
+    parameter {
+        string(name: 'env', defalutValue: 'dev', description: 'please enter the name')
+    }
+    stages {
+        stage (shell) {
+            steps {
+                echo $env
+            }
+        }
+    }
+}
+
+/// cicd project pipeline
+pipeline{
+    agent any
+     tools {
+        maven 'Maven-3.6.1'
+    }
+    
+    environment{
+        PATH = "/opt/maven3/bin:$PATH"
+    }
+    stages{
+        stage("Git Checkout"){
+            steps{
+                git credentialsId: 'javahome2', url: 'https://github.com/srinicloud87/myweb.git'
+            }
+        }
+        stage("Maven Build"){
+            steps{
+                sh "mvn clean sonar:sonar package"
+                
+            }
+        }
+        stage('Upload War To Nexus'){
+            steps{
+                  nexusArtifactUploader artifacts: [
+                       [
+                            artifactId: 'myweb', 
+                            classifier: '', 
+                            file: "target/myweb-8.2.0.war", 
+                            type: 'war'
+                       ]
+                  ], 
+                  credentialsId: 'nexus3', 
+                  groupId: 'in.javahome', 
+                  nexusUrl: '172.31.7.137:8081', 
+                  nexusVersion: 'nexus3', 
+                  protocol: 'http', 
+                  repository: 'sample-releases', 
+                  version: '8.2.0'  
+              }
+            }
+        stage("deploy-dev"){
+            steps{
+                sshagent(['tomcat-new']) {
+                sh """
+                    scp -o StrictHostKeyChecking=no target/myweb-8.2.0.war  ec2-user@172.31.8.144:/home/ec2-user/apache-tomcat-9.0.71/webapps/
+                    
+                    ssh ec2-user@172.31.8.144 /home/ec2-user/apache-tomcat-9.0.71/bin/shutdown.sh
+                    
+                    ssh ec2-user@172.31.8.144 /home/ec2-user/apache-tomcat-9.0.71/bin/startup.sh
+                
+                """
+            }
+            
+            }
+        }
+    }
+}

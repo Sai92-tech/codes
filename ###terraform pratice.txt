@@ -1,0 +1,33 @@
+###terraform pratice
+Go to github---> labs----> terraform---->install--->
+inTerraform terminology 3step is mandtory providesrs resources provisioners
+terraform -version    :   To know the version
+1st we create a one Directory for terraform all codes
+terraform file must with .tf exetenstion
+
+mkdir terracode
+cd terracode
+vi provider.tf---->  provider "aws" {
+
+}
+save and exit the file --->> Lets excute that fiel on name 
+terraform init  ::;   is the command to excute the file..
+#### To Create a instances by using terraform Script
+Open Vi provider.tf file
+provide "aws" {
+    access_key = 
+    secret_key =
+    region = "us-east-1"
+}
+resource "aws_instance" "jenkins" {
+    ami =   "ami-053b0d53c279acc90"
+    instance_type = "t2.micro"
+    count = 3 
+    key_name = "pradeepm"
+
+    tags = {
+        name = "jenkins"
+        name = "slave"
+    }
+}
+resource ::

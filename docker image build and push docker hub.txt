@@ -1,0 +1,35 @@
+cicd jenkins integrate with docker
+
+pipeline {
+    agent agent
+
+    stages {
+        stage ('clone') {
+            steps {               
+        checkout scmGit(branches: [[name: '*/master']], extensions: [], userRemoteConfigs: [[credentialsId: 'git_hub', url: 'https://github.com/Sai92-tech/PetClinic.git']])
+            }
+        }
+        stage ('build image'){
+            steps {
+            app = docker.build("saik92/petclinc:2")
+            }
+        }
+        stage ('push image') {
+            steps {
+               docker.withRegistry('https://registry.hub.docker.com', 'dockerhub')
+               app.push("${env.BUILD_NUMBER}")
+               app.push("latest")
+            }
+        }
+        stage ('running images'){
+            steps {
+                sh '''
+                docker run -d -p 6666:8080 saik92/petclinc:2
+                docker ps
+           
+         '''
+
+            }
+        }
+    }
+}
