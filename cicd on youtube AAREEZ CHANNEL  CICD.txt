@@ -1,0 +1,24 @@
+cicd on youtube AAREEZ CHANNEL
+#### clone the src code from github and push into jenkins and check the code quality by using the sonar push the docker 
+#### 1st we need a three instances for CICD JENKINS SONAR DOCKER 
+LETS GET STARTED
+connect to ssh key 
+in key pair folder:::ssh -i <keypairname> ubuntu@<ip>
+lets give the file permission to .pem file :  chmod 400 <.pem file>
+sudo apt-update
+#### Install java11
+sudo apt install openjdk-11-jre
+##For Install jenkins on server
+Go To google ---> type <jenkins.io> --->>> installing jenkins --->>> select OS Linux ---->> click on debian ubuntu --->>> there is a install command copy and paste in the server
+systemctl status jenkins  --- >>> to check the jenkins connection
+lets open the jenkins console with port jenkins 8080 port  ----->> click on install suggested plugins ---->>> and then installO
+Open the jenkins console
+### start the pipeline
+IN JENKINS ---->> New Item --->>> job name --->> select <Freestyle> option --->>>  
+Create one job --->>> clone git Url in Jnekins --->>> add webhook option in Jenkins
+Then Go to Git hub Repo settings to activate github webhook option <jenkins server/gothub-webhook/>  :: If any changes made by devloper then only pipeline will trigger automatically
+Afer webhook attached we select the option is -->>> selevt individule option in that group select <recent pushers nd pulls>  ::save 
+
+
+
+ 

@@ -1,0 +1,30 @@
+terraform install
+
+1.mkdir terraformfolder
+vi provide.tf
+provider "aws" {
+}
+provider "azurem" {
+}
+provider "google" {
+}
+
+###### terraform provider in IAM Access
+provider "aws" {
+   access_key = "access key"
+   secret_key = "secret access key"
+   region = "us-east-1"
+}
+####### Terraform EC2 Creation  what ever u creates it will consider as a resources
+resource "aws_instance" "instance name" {
+   ami = "ami id"
+   count = "no of instance"
+   instance = "t2micro"
+   tags = {
+      name = "sai"
+}
+   key_name = "keypair name"
+}
+
+
+

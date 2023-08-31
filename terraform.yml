@@ -1,0 +1,67 @@
+providers "aws" {
+  acees_key   = ""   # must to give acees key of IAM user
+  secret_key  = ""   # must to give secret access key of iam user
+  region      = ""   # must to AWS Console region
+
+}
+
+resource "aws_security_group" "test-sg" {    # first is secutiry grup by key value ## nd second is alias name of first name both r must
+  name = "test-sg"                           # what is u mentiond alias name is same to provide as name
+  vpc  = "vpc id"                            # In AWS already running instance should be give vpc id
+
+  ingress {                                  # ingress means inbound rules 
+    protocol = "tcp"                         #protocol is mandatory to connect to out of server
+    from_port = "0-65535"                    # from port means application port range should with in these range
+    to_port = "0-65535"                      # to port is above tthe same
+    cidr_blocks = ["0.0.0.0/0"]              # this is server ip address but real time u have to work with custom ip that ip is give here
+
+  }
+  ingress {                                  
+    protocol = "tcp"
+    from_port = "22"
+    to_port = "22"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+   egress {
+    protocol = "-1"
+    from_port = "0-65535"
+    to_port  = "0-65535"
+    cidr_blocks = ["0.0.0.0/0"]
+    ipv6_cidr_blocks = ["::/0"]
+    
+   }
+}
+
+resource "aws_s3_bucket" "s3b" {
+  bucket = "u can give any unique name"
+  acl = "private"
+
+  tags = {
+    name = "bucket1"
+    environment = "dev"
+  }
+}
+
+resource "aws_instances" "devinstances" {
+  ami      = "ami id" 
+  count    = 3
+  instance = "t2.micro"
+  tags     = {
+    name   = "demoinstance.${count.index}"
+  }
+  key_name = "key pair name.pem"
+}
+
+terraform {
+  backend "s3" {
+    name = "bucket name"
+    key = "terraform/terraform.tfstate"
+    region = ""
+    access_key = ""
+    secret_key = ""
+  }
+}
+
+
+
+saivonsadjkjhbfgaknsf

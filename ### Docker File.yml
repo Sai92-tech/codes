@@ -1,0 +1,15 @@
+### Docker File
+
+### write a docker file for tomcat deployment on ubuntu server
+MAINTAINER saikumar        ####username is optional
+FROM ubuntu
+RUN apt install java -y OR openjdk-8-jdk
+RUN mkdir /opt/tomcat
+WORKDIR /opt/tomcat
+ADD <tomcat url>
+RUN tar -xvzf <apachetomcat file>
+RUN MV <tomcat version> /opt/tomcat
+EXPOSE 8080
+CMD ["/opt/tomcat/bin/catalina.sh", "run"]
+
+

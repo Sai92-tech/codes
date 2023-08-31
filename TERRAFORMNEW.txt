@@ -1,0 +1,69 @@
+
+###terraform pratice
+Go to github---> labs----> terraform---->install--->
+inTerraform terminology 3step is mandtory providesrs resources provisioners
+terraform -version    :   To know the version
+1st we create a one Directory for terraform all codes
+terraform file must with .tf exetenstion
+
+mkdir terracode
+cd terracode
+vi provider.tf---->  provider "aws" {
+
+}
+save and exit the file --->> Lets excute that fiel on name 
+terraform init  ::;   is the command to excute the file..
+#### To Create a instances by using terraform Script
+Open Vi provider.tf file
+provider "aws" {
+    access_key = "in aws"
+    secret_key = "in aws "
+    region = "us-east-1"
+}
+resource "aws_instance" "jenkins" {
+    ami =   "ami-053b0d53c279acc90"
+    instance_type = "t2.micro"
+    count = 3 
+    key_name = "pradeepm"
+
+    tags = {
+        name = "jenkins"
+        name = "slave"
+    }
+}
+resource "aws_security_group"  "test-sg" {
+    name = "launch-wizard-1"
+    vpc_id = "vpc-002aef9a3aa631d67"
+    
+    ingress {
+        protocol = "tcp"
+        from_port = 80
+        to_port = 80
+        cidr_blocks = ["0.0.0.0/0"]
+    }
+    ingress {
+        protocol = "tcp"
+        from_port = 22
+        to_port = 22
+        cidr_blocks = ["0.0.0.0/0"]
+    }
+    egress {
+        protocol = "-1"
+        from_port = 0
+        to_port = 0
+        cidr_blocks = ["0.0.0.0/0"]
+        ipv6_cidr_blocks = ["::/0"]
+    }
+
+}
+###AWS S3 Bucket----->>> Create S3 Bucket file vi s3.tf
+resource "aws_s3_bucket" "s3b" {
+    bucket =  "bucket1"
+    acl = "private"
+
+    tags = {
+      name = "budcket1"
+      environment = "dev"
+    }
+}
+

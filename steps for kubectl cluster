@@ -1,0 +1,91 @@
+First Create a Instance in AWS with 2cpus and 4gb ram
+#####Then Create a roll in AWS --->>> Create IAM role -->> role 
+Create a Role --->>>aws service --->> usecase <ec2>  --->>> EKS (Cluster,admin,worker,service)--->>> NXT --->> Rolename <u can give any> --->> add --->> Create
+####Then this role is attach to EC2 instance
+Go to EC2 -->> ACTIONS --->>> SECURITY --->> MODIFI IAM ROLE --->> CHOOSE --->> EKS ---- >>> UPDATE IAM ROLE.
+#### Access key and secret key add to EC2
+Go to Root user Setting --->> create access key and secret access key -- save those keys one palce
+#### Now AWSCONFIGURE IN EC2
+Go to Ec2 --->>> Run the <aws configure> Command --->> sudo apt-get update --- >>> sudo apt-get install AWSCLI --->> Once install the cli to check.
+AWS CONFIGURE -- >>> It will ask accesskey and details give those details --->>> now check the details aws configure weather install r not
+aws configure -->>> ls --->> got to ~ root user --->> .aws file is here --->>> cd .aws -->>  creditentiols ---->> here is the our keys which wu have provide
+######## THEN INSTALL EKSCTL AND KUBECTL COMMANDS TO CREATE A CLUSTER
+Go t Google --->> eksctl kubectl install on ubunutu 20.04 --->>> hackerxone --->> lets copy the below commands 
+root Must in .AWS ONLY
+apt-get update
+curl -o kubectl https://amazon-eks.s3-us-west-2.amazonaws.com/1.21.2/2021-07-05/bin/linux/amd64/kubectl
+openssl sha1 -sha256 kubectl
+chmod +x ./kubectl
+mkdir -p $HOME/bin && cp ./kubectl $HOME/bin/kubectl && export PATH=$PATH:$HOME/bin
+kubectl version
+apt-get update 
+curl --silent --location "https://github.com/weaveworks/eksctl/releases/latest/download/eksctl_$(uname -s)_amd64.tar.gz" | tar xz -C /tmp
+mv /tmp/eksctl /usr/local/bin
+eksctl version
+
+#### then Create a cluster By using command line
+eksctl create cluster --name <clustername> --region <us-east-i>   ::: TO Create a cluster
+IN Aws --->> cloud Formation --->>> to know the cluster creations 
+OR
+### CLUSTER creations by using manifest file
+vi create cluster.yml
+kind: cluster config
+apiVersion: eksctl.io/v1alpha5
+metadata:
+   name: clustername
+   region: us-east-a
+nodegroup:
+  - name: ng-1
+    instanceTyps: m5.large
+    desiredCapacity: 10
+    volumeSize: 80
+    ssh:
+      allow: true
+ - name: ng-2
+   instanceType: m5.xlarge
+   desiredCapacity: 2
+   volumeSize: 100
+   ssh:
+     publicKeyPath: ~/.ssh/ec2.id_rsa.pub
+
+#### To Create a POD
+kind: POD
+apiVersion: v1
+metadata:
+   name: nginx
+   lables:
+      app: nginx
+      env: dev
+spec:
+  containers:
+  - name: cont1
+    image: nginx
+    ports:
+    - containerPort: 80
+
+After write the manifesto file 
+kubectl create -f <name of file>
+kubectl get pod  <pod name>  ::   to list of pods
+kubectl describe pod <ymal file>  ::  to veriy the file
+kubectl get pod -o wide:  to get pod info
+kubectl exec -it <podname> --/bin/sh     :::: to go inside a container
+kubectl delete pod <podname>   ::::: to delete the pod
+ 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

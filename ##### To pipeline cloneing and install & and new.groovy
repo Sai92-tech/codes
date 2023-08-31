@@ -1,0 +1,167 @@
+##### To pipeline cloneing and install & into nexus & into sonar
+pipeline {
+    agent any
+
+    environment {
+        NEXUS_VERSION = "nexus3"                    after steps --->> def mavenPOm = readMavenPom 'pom.xml'
+        NEXUS_REPOSITORY = "REPO NAME"
+        NEXUS-URL = "IP WITH PORT"
+        NEXUS_PROTOCOL = "HTTP"
+        NEXUS_CREDENTIAL_ID = "LOGINID"
+        ARTVERSION = "${env.BUILD.ID}"     OR VERSION: "${mavenPom.version}"  (It will trigger when ever pom.xml file changes)  this menstioned also file: row
+        scannerHome = tool 'sonar4.4.02170'
+        NEXUS_REPOGRP_ID = "REPO GROUP ID"
+    } 
+    stages {
+        stage ('clone') {
+            steps {
+                branch: 'master', url: 'git url'
+            }
+        }
+        stage ('build') {
+            steps {
+                sh 'mvn install'
+            }
+        }
+        stage ('test') {
+            steps {
+                sh 'mvn test'
+            }
+            post {
+                success {
+                    echo "now archiving artifacts"
+                    archiveAritifacts artifacts: '**/target/*.war'
+                }
+            }
+            }
+        }
+        stage ('integration test') {
+            steps {
+                sh 'mvn verify -DskipUnitTests'
+            }
+        }
+        stage ('code analysis with checkstyle') {
+            stpes {
+                sh 'mvn checkstyle:checkstyle'
+            }
+            post{
+                success {
+                    echo "generated code analysis results"
+                }
+            }
+        }
+        stage ('code analysis with sonar') {
+            environment {
+                scannerHome = tool 'myscanner4'
+                        }          
+            steps {
+                withSonarQubeEnv('sonar-pro') {
+                    sh ''' ${scannerHome}/bin/sonar-scanner -Dsonar.projectKey= <projectname>
+                   -Dsonar.projectname=       \
+                   -Dsonar.projectVersion=    \
+                   -Dsonar.sources=src/ \
+                   -Dsonar.java.binaries= \
+                   -Dsonar.junit.reportspath= \
+                   -Dsonar.jacoco.reportspath= \
+                   -Dsonar.java.chekcstyle.reportpaths=    '''
+                }
+            }
+            timeout(time :10, units: 'MINUTES') {
+                waitForQualityGate abortPipeline: true
+            }
+        }
+   }
+}
+
+############# For Multibranch pipeline will trigger only one specific branch
+pipeline {
+    agent any
+
+    stages {
+        stage ('clone stage') {
+            step {
+                git url clone
+            }
+        }
+        stage ('build stage') {
+            steps {
+                sh 'mvn clean package'
+            }
+        }
+        stage ('upload to nexus') {
+            when {
+               branch "release"
+            }
+            steps {
+                sh nexus pipeline syntax have to provide here
+            }
+        }
+    }
+}    Then save ----->> Multibranch pipeline ----->>> scan Multibranch pipeline
+
+####### ALL STAGES ARE TRIGGER PARELLAY
+pipeline {
+    agent any
+    stages {
+        stage ('parellel trigger') {
+            failFast true
+            parellel {
+                stage ('stage1') {
+                    steps {
+                        clone git URL
+                    }
+                }
+                stage ('stage2') {
+                    steps {
+                        sh 'mvn pacakge'
+                    }
+                }
+                stage ('buld') {
+                    steps {
+                        nexus 
+                    }
+                }
+            }
+        }
+    }
+}
+
+######  Build jobs retry OR re trigger
+pipeline {
+    agent any
+
+    stages {
+        stage ('') {
+            steps {
+                retry(3) 
+                excution path
+            }
+        }
+    }
+}
+
+
+############## Build Discardes
+pipeline {
+    agent any
+    options {
+        build discard details get it from pipeline syntax
+    }
+    stages {
+        stage {
+            steps {
+                ecxution path
+            }
+        }
+    }
+}
+############# For Nexus integration steps in Jnekins
+nexus artficat uploader plugin install
+in jenkins job---->> Build Step---->>> 
+INTEGRATION WITH NEXUS VAI USING CONSOLE   
+jenkins job--->> cinfig--->>> build step --->>> nexus art--->>> nexus--->>> http(leave it by defalut)---->>>IP:8081/NEXUS--->>>>GROUP ID(SUB REPO IN NEXUS)-->>
+VERSION--->>>> REPO(WHICH U HAVE MENTIONED IN NUXUS) ---->> ARTIFACTS --->>>> ARTIFACT ID (UCAN GIVE ANY)--->>> TYPE (WAR) --->> FILE (targrt/warfile path)-->>
+    save---->>> build.
+
+
+

@@ -1,0 +1,383 @@
+ansible files
+
+### Ansible is a configuration management tool
+### we use with ansible tool to connect one server to another server and maintaine playbooks
+
+###### Basic configaration
+create a instance 3 r 4 ---> After Created instances we configure a Ansible master  .. where is ansible installed that server work as a MASTER
+sudo apt-get update           :: To Update the server
+sudo adduser <username>       :: To Create a User
+Enter The password
+sudo su <username>            :: Switch to Normal User to Root User
+In Root User Apt install Ansible :: To Ansible install in Servers
+Ansible --version                :: To know the version
+Once ansible Installed there is a so many  file as Per understand for Better way we can Create two Files For Run the All commmands 
+1st One is  vi <ansible.cfg>
+In above file must have these line    [headers]
+                   2nd line           host_key_check = False    ###To config the file
+2nd One is vi <inventory>
+In above inventory File  we must maintaned a server ip Addrees    [webserver]
+                                                                   ip  ###u can mainataine n no of Servers
+
+### To connect one server to another server thare are two types
+
+#### One is SSH Password Authentication ----> Process is Given Below
+After user Creation 
+sudo vi /etc/sudoers --->>> In this file there is root ALL=(ALL:ALL) ALL line is here Next Below u can write
+sai ALL=(ALL:ALL) NOPASSWD: ALL
+Then 
+Sudo vi /etc/ssh/sshd-config -->>  file Open in this file 
+no passwordauthentication YES     ### bY defalut no is here we change into YES
+sudo systemctl restart sshd     --->>> after excute these command changes will be applicable
+<username@serverIP>: ssh <username@Nodeip>    ----->> this is login slave nodes from Master node same Process must to do all server 
+
+### 2nd in SSH Password less authentication
+<username@serverip> ssh-keygen         ::: To run this keypair helps connect oneserver to another server
+AFter .ssh direcory added 
+<username@serverip> : cd .ssh          ---->> To Go to that Directory
+Here is a Keys public key and Private key and remain
+<username@serverip>: .ssh: Lets Excute this command is <ssh-copy-id username@slaveip>
+Thats is ssh key added to the slave server and its connected 
+To Verify The connection is enbled r not   ::: <username@serverip> : ssh username@slaveip  -->> this connection checking process is all the same for all salve ips
+Must nd should we login and logout process can do how many servers u have to do in all those servers
+
+##### In those servers we must mention a Inventory file
+vi inventory
+[webserver]     ### fOR example servers
+10.0.0.0
+1.1.1.1
+2.2.2.2
+After Mentoned the password this command will be excute
+<ansible -i inventory -m ping all>       : To check the servers
+
+
+### To write a playbook for Apache2 
+vi apache.yml                      :::: yaml playbooks extenstions must be .yml
+---
+- hosts: all
+  become: yes
+  tasks:
+  - name: install apache
+    apt:
+      name: apache2
+      state: present
+:wq! To save & exit the file
+ansible-playbook apache.yml -i inventory      :: this command is helps file exution
+
+#### To Install A java By Use Yml playbook
+vi java.yaml
+---
+- hosts: all
+  become: yes
+  tasks:
+  - name: install jre 
+    apt:
+      name: default-jre OR opendk-8-jre
+      state: Present
+
+  - name: install jdk
+    apt: 
+      name: default-jdk OR openjdk-8-jdk
+      state: present
+
+ansible-playbook java.yml -i inventory     :: file will be excuted
+
+#### To Install jenkins By useing yaml Playbook
+vi jenkins.yml
+---
+- hosts: all
+  become: yes
+  tasks:
+  - name: install jre
+    apt:
+      name: default-jre
+      state: present
+
+  - name: install jdk
+    apt: 
+      name: default-jdk
+      state: present
+
+  - name: add key
+    apt_key:
+      url: https://pkg.jenkins.io/debian/jenkins.io-2023.key
+      state: present
+
+  - name: add repo
+    apt_repository:
+      name: deb  https://pkg.jenkins.io/debian binary/
+      state: present
+
+  - name: jenkins install
+    apt:
+      name: jenkins
+      update_cache: yes
+
+  - name: get admin password
+    command: cat /var/lib/jenkins/secrets/intialAdminpassword
+    become: yes
+    regisrot: admin_pass
+
+  - degug: var="admin_pass.stdout_lines + [admin_pass.sderr]"     ####this is is a standred syntax for jenkins page opening
+    
+ansible-playbook jenkins.yml -i inventory   ::: lets excute this file
+
+#### ad-hook commands for ansible
+uptime                                        :: its shows server timeing details
+free -m                                       :: its shows which memory u have data
+ansible -i inventory <slaveip> -m shell -a "uptime"          :::: this is command is use for specific server uptimes 
+ansible -i inventory <serverips groupname> -m shell -a "uptime"   ::: this is command is used for group of servers excusted
+ansible -i inventory <onegroup:2ndgroup> -m shell -a "uptime"      ::: this command uses multiple groups uptime lists
+ansible -i ineventory <serverip> -m command -a "apt install apache2 -b"   ::Install apache2 by using ad-hook command
+ansible -i inventory <server ip OR group ip> -m apt -a "name=nginx state=present" -b :: Install nginx by using ad-hook command
+
+#### Nexus install via ansible.playbok
+---
+- hosts: all
+  become: yes
+  tasks:
+  - name: install jre OR openjdk-8-jdk
+    apt:
+      name: defalut-jre
+      state: present 
+
+  - name: install jdk
+    apt:
+      name: defalut-jdk OR openjdk-8-jdk
+      state: present 
+
+  - name: downlod url
+    get_url:
+      url: https://download.sonatype.com/nexus/oss/nexus-2.14.4.03-bundle.zip  OR  https://download.sonatype.com/nexus/3/latest-unix.tar.gz
+      dest: /home/<username>
+
+  - name: install unzip
+    apt:
+      name: unzip
+      state: present
+
+  - name: extract the nexus
+    unarchive:
+      src: /home/<sai(username)>/nexus-2.14-4.03-bundle.zip
+      dest: /home/ram
+      mode: 0755
+      remote_src: yes
+      owner: <username>
+
+  - name: start nexus
+    commnad: sh /home/<username(sai)>/nexus-2.14.4.03/bin/nexus/start
+    become_user: <username>
+
+ansible-playbook nexus.yml -i inventory
+
+#### To nexus Delete Prasprctive after java instaallitaion these steps are excute
+---
+- hosts: all
+  become: yes
+  tasks:
+  - name: delete
+    file:
+      path: /home/username/neuxs package name
+      state: absent
+  
+### To write copy file a html edit file via Ansible Playbook
+First of all src code must in ansible master then only it will copied
+vi index.html ---->> Hello world ....   this massage to ansibel nodes
+---
+- hosts: all
+  become: yes
+  tasks:
+  - name: install java
+    apt:
+      name: default-jre
+      state: present
+
+  - name: install apache
+    apt:
+      name: apache2
+      state: present
+    
+  - name: copy index.html
+    copy:
+      src: index.html
+      dest: /var/www/html/index.html
+
+### To install all app & web servers in a single task via write a playbook
+---
+- hosts: all
+  become: yes
+  tasks:
+  - name: install jre & jdk & unzip
+    apt: name={{ item }} state=present
+    with_items:
+      - apache2
+      - unzip
+      - openjdk-8-jdk
+      - openjre-8-jre
+
+#### To Create a users while using the ansible playbook
+---
+- hosts: all
+  become: yes
+  tasks:
+  - name: create user
+    user:
+      name: 
+      group: 
+      state: 
+
+##### To add multi user
+--- 
+- hosts: all
+  become: yes
+  tasks:
+  - name: Create multi users
+    user: name={{ item }} state=present
+    with_items:
+      - <username is abc>
+      - <username is sai>
+      - <username is hareesh>
+      - <username is sarath>
+
+#### As per above multi users add into a Group
+---
+- hosts: all
+  become: yes
+  tasks:
+  - name: multi users add into a group
+    user: name={{ item.name }} group= {{ item.group }}  state=present
+    with_items:
+      - { name: abc, group: devops }
+      - { name: sai, group: devops }  
+      - { name: sarath, group: sai, devops }
+
+######### In inventory file haveing a some ubuntu servers and centos servers
+---
+- hosts: all
+  become: yes
+  tasks:
+  - name: install apache2 on ubuntu
+    apt:
+      name: apache2
+      state: present
+    when: ansible_distribution == "ubuntu"  
+
+  - name: install apache2 on centos
+    yum:
+      name: https
+      state: present
+    when: ansible_distribution == "centos "
+
+##### Handelers Creation Via Ansible Playbooks
+## Handelers helps task repeatedly excuted
+## vi nginx.yml
+---
+- hosts: all
+  become: yes
+  tasks:
+  - name: install nginx
+    apt:
+      name: nginx
+      state: present
+    notify: start notify
+  handlers:
+  - name: start nginx
+    service:
+      name: nginx
+      state: started
+To Excute the palybook ansible-playbook nginx.yml -i inventory  
+
+### Handlers with firewall configure
+---
+- hosts: all
+  become: yes
+  tasks:
+  - name: install apache
+    apt:
+      name: apache2
+      state: present
+  notify:
+    - start apache
+    - config firewall
+  handlers:
+  - name: start apache
+    service:
+      name: start apache 
+      state: started
+  - name: configure firewall
+    firewalld:
+      permenent: yes
+      imeadite: yes
+      service: apache2
+      state: enable
+## To Create a password for ansible playbook 
+Command is ---->>>> ansible-vault edit --vault-id @prompt <playbook name>  : This is for exsiting palybook
+Command is ---->>>> ansible-vault create --vault-id @prompt <laybook name>  : This is for Creating new palybook  
+Command is ---->>>> ansible-vault view --vault-id @prompt <palybook name>   : This is used for just view the palybook 
+Command is ---->>>> ansible-vault encrypt --vault-id @ prompt <Palybook name> : it hepls playbook content encrypted
+Command is ---->>>> ansible-vault rekey --ask-vault-pass <playbook name>    ::: it helps to change a existing password
+Command is ---->>>> ansible-vault decrypt --ask-vault-pass <palybook name>  :: To Remove our playbook Pasword
+if Ansible palybook has a password how to excute the palybook and command is 
+ansible-playbook --vault-id @prompt <palybook name> -i inventory :: 
+ ### To addto role and Create a role
+ansible-galaxy init <rolename>       :: This command is used to Create a New Role
+cd <rolename (tomcat)>:               :: To Change Directory into Role name tomcat
+ls                                     :: list of the file in role name
+mkdir template                         :: To Create a our own Directory in Tomcat Roll name To Maintaine a files
+cd handlers                            :: Change directory into Handlers
+Thare is one main.yml file we need to change this --->>> Into main.yml we have to write a ansible palybook content
+---
+- name: restart tomcat
+  service:
+    name: tomcat
+    state: restarted
+:wq!       To save and exit the handlers file
+Then Go to Tasks folder  ----  >>>>> cd tasks  --->>>> Thare is a file on the name of main.yml (here is mentione what do u want to write palybook)
+vi main.yml
+---
+- name: install jdk & tomcat                                              
+  yum: names= {{ item }} state: present
+  with_items:                                                        #### For handlers we must create a one file in handler main.yml
+    - java-1.8.0-openjdk-devel                                            vi main.yml
+    - tomcat                                                              ---   
+    - tomcat-webapps                                                      - name: start tomcat     
+    - tomcat-admin-webapps 
+    - wget                                                                  service:
+  notify:                                                                     name: tomcat
+   - start tomcat                                                             state: started            
+
+- name: copy tomcat-user.xml                                         ### For this we create a one file name of tomcat-user.xml in template dire
+  templates:                                                              vi tomcat-user.xml
+    src: tomcat-user.xml                                                 <tomcat-users>
+    dest: /user/share/tomcat/conf/tomcat-user.xml      <user username="sai" password="sai" roles="manager-gui,admin-gui"/                
+                                                                         </tomcat-users>
+
+  notify:                                                                #### For handlers we must create a one file in handler main.yml  
+  - restart tomcat                                                        vi main.yml
+                                                                          ---                                                                   - name: restart tomcat
+                                                                            service:
+                                                                              name: tomcat
+                                                                              state: restarted
+- name: copy shell script                                                #### For deploy purpose we have write a once file in template folder
+  templates:                                                                   vi deploy.sh
+    src: deploy.sh                                                            #!/bin/bash 
+    dest: /tmp                                                                package= .war file artifact url from nexus in this headrs
+    mode: 0777                                                                webapps= "/user/share/tomcat/webapps"
+                                                                              cd /tmp
+                                                                              echo "downloding war file" 
+- name: excute shell script                                                   wget $package
+  command: sh deploy.sh                                                       cp .war $webapps
+  args:
+    chdir: /tmp
+    register: deploy
+
+
+- debug: "var=deploy.stdout_lines+ [deploy.stderr]"                                                                     
+After  writeing the playbook to escape the all sub directorys we have in only ansible 
+sai@is:ansible: vi role.yml
+                ---
+                - hosts: all
+                  become: yes
+                  roles:
+                    - tomcat
+ansible-tomcat role.yml -i inventory
