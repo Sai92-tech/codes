@@ -22,3 +22,70 @@ apt-get update
 curl --silent --location "https://github.com/weaveworks/eksctl/releases/latest/download/eksctl_$(uname -s)_amd64.tar.gz" | tar xz -C /tmp
 mv /tmp/eksctl /usr/local/bin
 eksctl version
+
+#### then Create a cluster By using command line
+eksctl create cluster --name <clustername> --region <us-east-i>   ::: TO Create a cluster
+IN Aws --->> cloud Formation --->>> to know the cluster creations 
+OR
+### CLUSTER creations by using manifest file
+vi create cluster.yml
+kind: cluster config
+apiVersion: eksctl.io/v1alpha5
+metadata:
+   name: clustername
+   region: us-east-a
+nodegroup:
+  - name: ng-1
+    instanceTyps: m5.large
+    desiredCapacity: 10
+    volumeSize: 80
+    ssh:
+      allow: true
+ - name: ng-2
+   instanceType: m5.xlarge
+   desiredCapacity: 2
+   volumeSize: 100
+   ssh:
+     publicKeyPath: ~/.ssh/ec2.id_rsa.pub
+
+#### To Create a POD
+kind: POD
+apiVersion: v1
+metadata:
+   name: nginx
+   lables:
+      app: nginx
+      env: dev
+spec:
+  containers:
+  - name: cont1
+    image: nginx
+    ports:
+    - containerPort: 80
+
+After write the manifesto file 
+kubectl create -f <name of file>
+kubectl get pod  <pod name>  ::   to list of pods
+kubectl describe pod <ymal file>  ::  to veriy the file
+kubectl get pod -o wide:  to get pod info
+kubectl exec -it <podname> --/bin/sh     :::: to go inside a container
+kubectl delete pod <podname>   ::::: to delete the pod
+ 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
