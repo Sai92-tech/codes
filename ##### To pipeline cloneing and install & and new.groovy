@@ -3,12 +3,12 @@ pipeline {
     agent any
 
     environment {
-        NEXUS_VERSION = "nexus3"
+        NEXUS_VERSION = "nexus3"                    after steps --->> def mavenPOm = readMavenPom 'pom.xml'
         NEXUS_REPOSITORY = "REPO NAME"
         NEXUS-URL = "IP WITH PORT"
         NEXUS_PROTOCOL = "HTTP"
         NEXUS_CREDENTIAL_ID = "LOGINID"
-        ARTVERSION = "${env.BUILD.ID}"
+        ARTVERSION = "${env.BUILD.ID}"     OR VERSION: "${mavenPom.version}"  (It will trigger when ever pom.xml file changes)  this menstioned also file: row
         scannerHome = tool 'sonar4.4.02170'
         NEXUS_REPOGRP_ID = "REPO GROUP ID"
     } 
