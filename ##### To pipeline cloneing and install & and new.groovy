@@ -155,5 +155,13 @@ pipeline {
         }
     }
 }
+############# For Nexus integration steps in Jnekins
+nexus artficat uploader plugin install
+in jenkins job---->> Build Step---->>> 
+INTEGRATION WITH NEXUS VAI USING CONSOLE   
+jenkins job--->> cinfig--->>> build step --->>> nexus art--->>> nexus--->>> http(leave it by defalut)---->>>IP:8081/NEXUS--->>>>GROUP ID(SUB REPO IN NEXUS)-->>
+VERSION--->>>> REPO(WHICH U HAVE MENTIONED IN NUXUS) ---->> ARTIFACTS --->>>> ARTIFACT ID (UCAN GIVE ANY)--->>> TYPE (WAR) --->> FILE (targrt/warfile path)-->>
+    save---->>> build.
+
 
 
