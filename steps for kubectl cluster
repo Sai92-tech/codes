@@ -70,6 +70,14 @@ kubectl describe pod <ymal file>  ::  to veriy the file
 kubectl get pod -o wide:  to get pod info
 kubectl exec -it <podname> --/bin/sh     :::: to go inside a container
 kubectl delete pod <podname>   ::::: to delete the pod
+####
+CLUSTER IP IS NOT EXPOSE THE PORTS FOR OUTSIDEWORLD
+NODEPORT & LOADBALANCERS ARE ONLY EXPOSE THE PORTS FOR OUTSIDE
+
+##### To Create the node port by using command line in CLUSTER IP POD\
+kubectl expose pod <podname> --type=nodeport --port=80
+
+
  
 
 
