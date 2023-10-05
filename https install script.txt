@@ -1,0 +1,30 @@
+
+
+1st log in into server --->>> sudo -i into root user --->>> mkdir <dir name> --->> cd dir name
+
+vi httpd.sh
+#!/bin/bash
+
+#####
+DATE=
+AUTHER=
+######
+
+# install the packages
+apt-get install https -y
+apt-get install unzip -y
+
+#start & enable the service 
+systemctl start httpd
+systemctl enable httpd
+
+# download the url
+cd /tmp
+wget -o website.url
+cd /tmp/ unzip url
+
+#copy the date from local to hpptd webpage
+cp -r /tmp/website/* /var/www/html
+
+# restart the service
+systemctl restart httpd
