@@ -166,7 +166,7 @@ spec:
   selector:
     matchLable:
       app: above lable name nd these lable name sholud be match
-  type: NodePort
+  type: NodePort      ARE   we can use LOADBALANCER as well...its help us app access with DNS name in outside world
   ports:
   - nodePort: 31000  nodeport should be 31000-32767 below only
     port: webserver port if webserver is nginx then port is 80

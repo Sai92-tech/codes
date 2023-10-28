@@ -5,6 +5,16 @@ providers "aws" {
 
 }
 
+resource "aws_instances" "devinstances" {
+  ami      = "ami id" 
+  count    = 3
+  instance = "t2.micro"
+  tags     = {
+    name   = "demoinstance.${count.index}"
+  }
+  key_name = "key pair name.pem"
+}
+
 resource "aws_security_group" "test-sg" {    # first is secutiry grup by key value ## nd second is alias name of first name both r must
   name = "test-sg"                           # what is u mentiond alias name is same to provide as name
   vpc  = "vpc id"                            # In AWS already running instance should be give vpc id
@@ -42,15 +52,7 @@ resource "aws_s3_bucket" "s3b" {
   }
 }
 
-resource "aws_instances" "devinstances" {
-  ami      = "ami id" 
-  count    = 3
-  instance = "t2.micro"
-  tags     = {
-    name   = "demoinstance.${count.index}"
-  }
-  key_name = "key pair name.pem"
-}
+
 
 terraform {
   backend "s3" {

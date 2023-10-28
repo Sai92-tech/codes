@@ -12,24 +12,4 @@ RUN MV <tomcat version> /opt/tomcat
 EXPOSE 8080
 CMD ["/opt/tomcat/bin/catalina.sh", "run"]
 
-#####Sample WAR FILE TOMCAT
-1st the url download in /tmp folder WGET <LINK>
-CD /HOME/UBUNTU
-Vi Docker File
-FROM ubuntu:18.04
-ADD jdk-8u331-linux-x64.tar.gz /tmp
-RUN mv /tmp/jdk/1.8.0-331 /opt/java
-ADD apache tomcat lonk form tomcat website
-RUN mv /tmp/apache tomcat /opt/tomcat
-ENV java_home /opt/java
-ENV tomcat_home /opt/java
-ENV JAVA-VERSION 1.8
-ENV tomcat-vesion
-COPY myapp.war /opt/tomcat/webapps/
-EXPOSE 8080
-CMD ["/OPT/TOMCAT/BIN/CATALINA.SH", "RUN"]
-After writeing the image WE CAN BUILD IT
-docker build -t imagename:version name -f myapp/tmp
-docker run -d -p imagename:v1
-
 

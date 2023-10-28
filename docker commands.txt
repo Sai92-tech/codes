@@ -1,0 +1,71 @@
+custom Docker file
+FROM ---->>> OS
+MAINTAINER --->>> details of user
+RUN     builds the application    instuctions
+ADD      Will help us to add the links
+COPY   add files from your docker client
+MV   one file to another file
+WRKDIR  Present working 
+EXPOSE  port id with this u can access the application
+CMD   some spectific commands run in cont
+MKDIR  to create a folder
+TOUCH to create a file
+
+
+Normal commands
+docker images                 to list of images
+docker image ls               to list of images
+docker ps                     to show only running containers
+docker ps -a                  to show all running & exited conitaner
+docker pull <imagename>               to pull the images form docker hub for create a images
+docker  login --username              to login our docker hub details 
+docker push image:tag .          to push the images which we have created local
+docker run -d -p 8080:8080  image name     to assgin a container for specific r custom port
+docker run -d _P image name                to create a container id which we have mentioned port in docker file
+docker exec -it contid sh                  to enter into a container
+docker network create -d bridge image    --->> to create a our own network
+docker run -d --name image --net bridge image:tag   --->>> to launch a cont
+docker inspect contid | grep ip        --->>>> to the container details
+inside a container  ping@ cont2 id             --->>> it will ping for 2nd container
+docker stop and docker start nd docker restart  contids  ---->>> to start and stop nd restart the containers
+docker compose               ---->>> to create and manage multicontainers\
+docker compose up   ---->>> after writing docker file is running 
+docker compose ps    ----->>> to check the list
+docker copose rm      ----->>> to file delete
+docker run -d -p hostport:serverport image sleep 1000  >>> is help to run the empty cont for specific time
+docker history                  ---->> to know the docker history
+docker --version                 ---->>> to know the version
+docker search server                --->>> to verify the apps like mysql nginx tomcat 
+docker attach contname          ----->>>>> to enter into a cotainer with cont name
+docker rmi images   ---->>>> to delete the docker images
+docker swarm init      ---->>> to convert a normal docker node into a master node
+docker nod ls            --->>> to list nodes
+docker service ps servicename    : to list of service list
+docker run --name <iamge name> -d -p port:port image:tag --->>> by command line we can create the images
+docker network ls       ---->>> list of networks (bridge host none )
+docker voumes ls           ----->>> list volumes
+docker commit contid username/imagename       ---->>> to create a image an edited to on the local system
+docker build -t image:tag   ----->> after write the docker file to excute the docker file
+docker network disconnect contid       ---->>> to disconnect the network from cont
+docker network inspect bridge ---->>> to know the bridge network details
+docker info    ----->> to know the docker info ip
+docker diff cont   ----   to inspect the changes
+docker cont prune              --->>> it will remove all stopped container
+docker pause cont           ---->>> to pause a container
+docker unpause container      ----->>> to unpause cont
+docker wait container     ---->>> waits until the container terminated and shows the exit code
+docker top cont    ---->>> show all running processes in an existing containers
+docker tag image:tag    ---->> to tagging the image
+docker service ls   --->>> to list of the services
+docker service create a image --->>> create a new service
+docker network create networkname   --->>> creates a new network
+docker network connect networkname cont   ---  >>> connects a container to a network
+docker kill contid    --->>> to container stop forcefully in runing process
+
+
+
+
+
+
+
+

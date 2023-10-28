@@ -1,35 +1,35 @@
 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 (02-08-2023 from 90days)
+       nagios password:GYE7tRpr9VjV76@FqAtO
 
-JAVA_HOME="/usr/lib/jvm/java-11-openjdk-amd64"       nagios password:GYE7tRpr9VjV76@FqAtO
+7569594051 fake mobile number  sai116kumark@gmail.com
 
-sonarqube token:1cb8b9a8be795ef89e262af0da5b6cd2b213db54   dckr_pat_cV_WXNyTCRZHqk8cGalNmTdgBAU
 
 
 target/Example-0.0.1-SNAPSHOT.war   1.0.0 target/vprofile-v2.war
 
-Ace key:AKIAQRYWWKPIPWZOWIR2
-sce key :2B2+b0CP9gANaePMPK9Pji+PxLns5emspo4YmUB8  for S3bucket
+Ace key: AKIAYHKSFNF2RPFKWMEU
+sce key : zAVw7Omd+8AgvJATKls0Krye+c+W2LZWUxXRzsUS
 
 AWS Accounts Ids:
 
 1.ksk92kumar@gmail.com                aadhyasrim5@gmail.com             webex id: 26434992452
-A.Sai92@143          inavtive         Karothisai92@                     Password: arM4Q58quzE
+A.Sai92@143          inavtive         Karothisai92@ inactive            Password: arM4Q58quzE
 
-2.sai.144143@gmail.com                aadhyasrim5@gmail.com
-A.Karothisai92@	      inactive        Karothisai92@ 
+2.sai.144143@gmail.com                mshanvith99@gmail.com            vennelacoolstar@gmail.com   AKIAQJ6BWUWXXPOC5I4S
+A.Karothisai92@	      inactive        Karothisai92@   inactive         Pradeep4me@     inactive     udwb8JWWJilMznjW3T4lSJt6CAAnyAeI8C9h2vYT
 
-3.ksaikarthik1719@gmail.com               AKIAWMIQAC4R76WEA5G3
-A.Karothisai92@       inactive            S5lZAkmqk9q/m+NzqWj94tkHt4kan0BhD5Yp+yaa
+3.ksaikarthik1719@gmail.com              hariishhk0102@gmail.com              
+A.Karothisai92@       inactive           Kharish1@       active
 
-4.pradeep.marri2@gmail.com
-A.Pradeep@1203         active
-  
-5.saikumar.karothi92@gmail.com
-A.Karothisai92@
+4.pradeep.marri2@gmail.com                pradeepmarri13@gmail.com      pradeepmarri13@gmail.com     active
+A.Pradeep@1203       inactive             pradeep@1234                  Karothisai92@    (FOR AWS ACCOUNT)
+   
+5.saikumar.karothi92@gmail.com            power.praveenkumar007@gmail.com
+A.Karothisai92@    inactive               Kpraveen007@  
 
-6.karothicharansrinivas@gmail.com
-A.Karothisai92@
-
+6.karothicharansrinivas@gmail.com         sai1719kumar@gmail.com
+A.Karothisai92@           active          Sai1719kumar@
+ 
 
 docker commit -m "install nginx" -c 'CMD /usr/sbin/nginx -g "daemon off;"' -c 'EXPOSE 80' fc54674a54f5 samplenginx:v2 : its
  help to image up & running
